@@ -6,6 +6,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import time
+from http_request_randomizer.requests.proxy.requestProxy import RequestProxy
+
+# requests proxies and makes a list from them
+req_proxy = RequestProxy()
+proxy_list = req_proxy.get_proxy_list()
+local_ips = [proxy.ip for proxy in proxy_list if proxy.country == "United States"]
+
+# set webDriver address with proxy ip
+PROXY = local_ips[0]
+webdriver.DesiredCapabilities.CHROME['proxy'] = {
+    "httpProxy": PROXY,
+    "ftpProxy": PROXY,
+    "sslProxy": PROXY,
+    "proxyType": "MANUAL"
+}
+
+print(f'proxy id here: {PROXY}')
+
+webdriver.DesiredCapabilities.CHROME['acceptSslCerts']=True
 
 # Routing if using Firefox driver - comment out if doesn't apply
 # driver = webdriver.Firefox()
@@ -17,16 +36,19 @@ options.add_argument('window-size=1200x600')
 options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
+# for testing ip identification of proxy
+# driver.get('http://ipv4.icanhazip.com')
+
 
 categories = [
+    "sleeping+bags",
+    "sleeping+pads",
     "carabiners", 
     "quickdraws", 
     "belay+devices", 
     "chalk", 
     "mens+trail+shoes", 
-    "womens+trail+shoes",
-    "sleeping+bags",
-    "sleeping+pads"
+    "womens+trail+shoes"
 ]
 
 for category in categories:
